@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Listings</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #141414;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            width: 100%;
+            padding: 20px 50px;
+            color: #fff;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(20,20,20,0.9), transparent);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-logo:hover {
+            color: #e50914;
+        }
+
+        .search-bar {
+            position: relative;
+            flex-grow: 1;
+            max-width: 400px;
+            margin: 0 20px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            outline: none;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-bar input::placeholder {
+            color: #bbb;
+        }
+
+        .search-bar input:focus {
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .navbar-profile {
+            position: relative;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .navbar-profile img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-profile img:hover {
+            transform: scale(1.1);
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: #1c1c1c;
+            border: 1px solid #333;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            width: 150px;
+            z-index: 1001;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 15px;
+            color: #fff;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #333;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 80vh;
+            overflow: hidden;
+            margin-top: 80px; /* Height of navbar */
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(180deg, transparent, #141414 80%);
+            z-index: 1;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.6);
+            transition: transform 0.5s ease;
+        }
+
+        .hero-section:hover .hero-image {
+            transform: scale(1.05);
+        }
+
+        .hero-content {
+            position: absolute;
+            bottom: 30%;
+            left: 50px;
+            z-index: 2;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            color: #ddd;
+        }
+
+        .hero-buttons {
+            margin-top: 20px;
+        }
+
+        .hero-buttons button {
+            padding: 12px 25px;
+            margin-right: 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-play {
+            background-color: #e50914;
+            color: #fff;
+        }
+
+        .btn-play:hover {
+            background-color: #f40612;
+            transform: scale(1.05);
+        }
+
+        .btn-info {
+            background-color: rgba(109, 109, 110, 0.7);
+            color: #fff;
+        }
+
+        .btn-info:hover {
+            background-color: rgba(109, 109, 110, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* Course Sections */
+        .section {
+            padding: 20px 50px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section h2 {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 2rem;
+            color: #fff;
+        }
+
+        .course-row {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            scroll-behavior: smooth;
+        }
+
+        .course-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .course-item {
+            flex: 0 0 auto;
+            width: 250px;
+            margin-right: 15px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 5px;
+            background-color: #1c1c1c;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .course-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .course-info {
+            padding: 10px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .course-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .course-instructor {
+            font-size: 0.9rem;
+            color: #bbb;
+            margin-bottom: 10px;
+        }
+
+        .course-rating {
+            display: flex;
+            align-items: center;
+        }
+
+        .course-rating img {
+            width: 16px;
+            height: 16px;
+            margin-right: 2px;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px 50px;
+            background-color: #141414;
+            text-align: center;
+            color: #6c757d;
+            margin-top: 40px;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .navbar-logo {
+                font-size: 1.2rem;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+                max-width: 90%;
+            }
+
+            .hero-buttons button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .section {
+                padding: 20px 20px;
+            }
+
+            .course-item {
+                width: 200px;
+            }
+
+            .course-item img {
+                height: 120px;
+            }
+
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .search-bar {
+                max-width: 250px;
+                margin: 0 10px;
+            }
+
+            .navbar-profile img {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .navbar-logo {
+                font-size: 1.5rem;
+            }
+
+            .hero-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .hero-content p {
+                font-size: 0.9rem;
+            }
+
+            .search-bar {
+                max-width: 200px;
+            }
+
+            .course-info {
+                padding: 8px;
+            }
+
+            .course-title {
+                font-size: 1rem;
+            }
+
+            .course-instructor {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Dropdown Animation */
+        .dropdown-menu {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="navbar-logo">MyCourses</div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search courses...">
+        </div>
+        <div class="navbar-profile" id="navbarProfile">
+            <img src="https://via.placeholder.com/35x35?text=P" alt="Profile">
+            <!-- Dropdown Menu -->
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="/profile">My Profile</a>
+                <a href="/settings">Settings</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <img src="https://via.placeholder.com/1920x1080?text=Featured+Course" alt="Featured Course" class="hero-image">
+        <div class="hero-content">
+            <h1>Learn Something New Today</h1>
+            <p>Explore our extensive library of courses and expand your knowledge in various fields.</p>
+            <div class="hero-buttons">
+                <button class="btn-play">Get Started</button>
+                <button class="btn-info">Learn More</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Sections -->
+    <div class="section">
+        <h2>Recent</h2>
+        <div class="course-row">
+            <!-- Course Item -->
+            <div class="course-item">
+                <img src="https://via.placeholder.com/250x150?text=Course+1" alt="Course 1">
+                <div class="course-info">
+                    <div class="course-title">Course Title 1</div>
+                    <div class="course-instructor">Instructor Name</div>
+                    <div class="course-rating">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star--v1.png" alt="Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star--v1.png" alt="Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star--v1.png" alt="Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star--v1.png" alt="Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star-half-empty.png" alt="Half Star">
+                    </div>
+                </div>
+            </div>
+            <!-- Repeat Course Items -->
+            <div class="course-item">
+                <img src="https://via.placeholder.com/250x150?text=Course+2" alt="Course 2">
+                <div class="course-info">
+                    <div class="course-title">Course Title 2</div>
+                    <div class="course-instructor">Instructor Name</div>
+                    <div class="course-rating">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star--v1.png" alt="Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star--v1.png" alt="Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star--v1.png" alt="Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star-half-empty.png" alt="Half Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star-0.5.png" alt="Empty Star">
+                    </div>
+                </div>
+            </div>
+            <!-- Add more course items as needed -->
+            <!-- ... -->
+        </div>
+    </div>
+
+    <!-- Repeat for other categories -->
+    <div class="section">
+        <h2>Category 1</h2>
+        <div class="course-row">
+            <!-- Course Items -->
+            <div class="course-item">
+                <img src="https://via.placeholder.com/250x150?text=Course+3" alt="Course 3">
+                <div class="course-info">
+                    <div class="course-title">Course Title 3</div>
+                    <div class="course-instructor">Instructor Name</div>
+                    <div class="course-rating">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star--v1.png" alt="Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star--v1.png" alt="Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star-half-empty.png" alt="Half Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star-0.5.png" alt="Empty Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star-0.5.png" alt="Empty Star">
+                    </div>
+                </div>
+            </div>
+            <!-- Add more course items as needed -->
+            <!-- ... -->
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Category 2</h2>
+        <div class="course-row">
+            <!-- Course Items -->
+            <div class="course-item">
+                <img src="https://via.placeholder.com/250x150?text=Course+4" alt="Course 4">
+                <div class="course-info">
+                    <div class="course-title">Course Title 4</div>
+                    <div class="course-instructor">Instructor Name</div>
+                    <div class="course-rating">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star--v1.png" alt="Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star-0.5.png" alt="Empty Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star-0.5.png" alt="Empty Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star-0.5.png" alt="Empty Star">
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/star-0.5.png" alt="Empty Star">
+                    </div>
+                </div>
+            </div>
+            <!-- Add more course items as needed -->
+            <!-- ... -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        &copy; 2024 MyCourses. All rights reserved.
+    </div>
+
+    <!-- JavaScript for Interactive Elements -->
+    <script>
+        // Toggle Dropdown Menu
+        const navbarProfile = document.getElementById('navbarProfile');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+
+        navbarProfile.addEventListener('click', function(event) {
+            event.stopPropagation(); // Prevent event from bubbling up to document
+            dropdownMenu.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            dropdownMenu.classList.remove('active');
+        });
+
+        // Search Bar Functionality
+        const searchInput = document.getElementById('searchInput');
+
+        searchInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query !== '') {
+                    // Redirect to /search page with query parameter
+                    window.location.href = `/search?q=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Courses - MyCourses</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #141414;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            width: 100%;
+            padding: 20px 50px;
+            color: #fff;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(20,20,20,0.9), transparent);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-logo:hover {
+            color: #e50914;
+        }
+
+        .search-bar {
+            position: relative;
+            flex-grow: 1;
+            max-width: 400px;
+            margin: 0 20px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            outline: none;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-bar input::placeholder {
+            color: #bbb;
+        }
+
+        .search-bar input:focus {
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .navbar-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .navbar-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-profile img:hover {
+            transform: scale(1.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            margin-top: 80px; /* Height of navbar */
+            padding: 20px 50px;
+            gap: 30px;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            width: 250px;
+            background-color: #1c1c1c;
+            padding: 25px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            height: fit-content;
+            position: sticky;
+            top: 100px; /* Adjust based on navbar height */
+        }
+
+        .filter-section h3 {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+        }
+
+        .filter-group {
+            margin-bottom: 25px;
+        }
+
+        .filter-group h4 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #bbb;
+        }
+
+        /* Custom Checkbox Styles */
+        .filter-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            position: relative;
+            padding-left: 25px;
+            transition: color 0.3s ease;
+        }
+
+        .filter-group label:hover {
+            color: #e50914;
+        }
+
+        .filter-group input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 18px;
+            width: 18px;
+            background-color: #333;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, border 0.3s ease;
+        }
+
+        .filter-group label:hover .checkmark {
+            background-color: #444;
+        }
+
+        .filter-group input:checked ~ .checkmark {
+            background-color: #e50914;
+            border: 2px solid #fff;
+        }
+
+        /* Checkmark Indicator */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .filter-group input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .filter-group .checkmark:after {
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Courses Section */
+        .courses-section {
+            flex-grow: 1;
+        }
+
+        .courses-section h2 {
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .course-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .course-item {
+            width: 250px;
+            background-color: #1c1c1c;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .course-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+            background-color: #2a2a2a;
+        }
+
+        .course-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .course-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .course-info {
+            padding: 15px;
+        }
+
+        .course-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .course-item:hover .course-title {
+            color: #e50914;
+        }
+
+        .course-instructor {
+            font-size: 0.95rem;
+            color: #bbb;
+            margin-bottom: 10px;
+        }
+
+        .course-rating {
+            display: flex;
+            align-items: center;
+        }
+
+        .course-rating img {
+            width: 18px;
+            height: 18px;
+            margin-right: 3px;
+        }
+
+        /* Loading Indicator */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            margin-top: 50px;
+        }
+
+        .loading span {
+            width: 12px;
+            height: 12px;
+            margin: 0 6px;
+            background-color: #66ff66;
+            border-radius: 50%;
+            display: inline-block;
+            opacity: 0;
+            animation: loading-dots 1.4s infinite;
+        }
+
+        .loading span:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .loading span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loading-dots {
+            0% {
+                opacity: 0;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px 50px;
+            background-color: #141414;
+            text-align: center;
+            color: #6c757d;
+            margin-top: 40px;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .filter-section {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 30px;
+            }
+
+            .course-item {
+                width: 100%;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .search-bar {
+                max-width: 250px;
+                margin: 0 10px;
+            }
+
+            .filter-section {
+                padding: 15px 15px;
+            }
+
+            .filter-section h3 {
+                font-size: 1.1rem;
+            }
+
+            .filter-group h4 {
+                font-size: 0.95rem;
+            }
+
+            .filter-group label {
+                font-size: 0.85rem;
+                padding-left: 22px;
+            }
+
+            .course-info {
+                padding: 12px;
+            }
+
+            .course-title {
+                font-size: 1.1rem;
+            }
+
+            .course-instructor {
+                font-size: 0.9rem;
+            }
+
+            .courses-section h2 {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .navbar-logo {
+                font-size: 1.5rem;
+            }
+
+            .search-bar {
+                max-width: 200px;
+            }
+
+            .filter-section h3 {
+                font-size: 1rem;
+            }
+
+            .filter-group h4 {
+                font-size: 0.9rem;
+            }
+
+            .filter-group label {
+                font-size: 0.8rem;
+                padding-left: 20px;
+            }
+
+            .course-info {
+                padding: 10px;
+            }
+
+            .course-title {
+                font-size: 1rem;
+            }
+
+            .course-instructor {
+                font-size: 0.85rem;
+            }
+
+            .courses-section h2 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="navbar-logo">MyCourses</div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search courses...">
+        </div>
+        <div class="navbar-profile">
+            <img src="https://via.placeholder.com/40x40?text=P" alt="Profile">
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h3>Filters</h3>
+            <div class="filter-group">
+                <h4>Category</h4>
+                <label>
+                    <input type="checkbox" name="category" value="Technology">
+                    <span class="checkmark"></span>
+                    Technology
+                </label>
+                <label>
+                    <input type="checkbox" name="category" value="Business">
+                    <span class="checkmark"></span>
+                    Business
+                </label>
+                <label>
+                    <input type="checkbox" name="category" value="Art">
+                    <span class="checkmark"></span>
+                    Art
+                </label>
+                <label>
+                    <input type="checkbox" name="category" value="Science">
+                    <span class="checkmark"></span>
+                    Science
+                </label>
+            </div>
+            <div class="filter-group">
+                <h4>Rating</h4>
+                <label>
+                    <input type="checkbox" name="rating" value="5">
+                    <span class="checkmark"></span>
+                    5 Stars
+                </label>
+                <label>
+                    <input type="checkbox" name="rating" value="4">
+                    <span class="checkmark"></span>
+                    4 Stars
+                </label>
+                <label>
+                    <input type="checkbox" name="rating" value="3">
+                    <span class="checkmark"></span>
+                    3 Stars
+                </label>
+                <label>
+                    <input type="checkbox" name="rating" value="2">
+                    <span class="checkmark"></span>
+                    2 Stars
+                </label>
+                <label>
+                    <input type="checkbox" name="rating" value="1">
+                    <span class="checkmark"></span>
+                    1 Star
+                </label>
+            </div>
+        </div>
+
+        <!-- Courses Section -->
+        <div class="courses-section">
+            <h2>Search Results for "<span id="searchTerm"></span>"</h2>
+            <div id="loadingIndicator" class="loading">
+                <span></span><span></span><span></span>
+            </div>
+            <div id="coursesRow" class="course-row" style="display: none;">
+                <!-- Course Items will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        &copy; 2024 MyCourses. All rights reserved.
+    </div>
+
+    <!-- JavaScript for Search Functionality -->
+    <script>
+        // Function to get query parameters
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Simulated fetch function (replace with real API call)
+        function fetchSearchResults(query) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // Simulated data
+                    const results = [
+                        {
+                            title: "Introduction to JavaScript",
+                            instructor: "John Doe",
+                            rating: 4.5,
+                            image: "https://via.placeholder.com/250x150?text=JavaScript"
+                        },
+                        {
+                            title: "Advanced Python Programming",
+                            instructor: "Jane Smith",
+                            rating: 5,
+                            image: "https://via.placeholder.com/250x150?text=Python"
+                        },
+                        {
+                            title: "Graphic Design Basics",
+                            instructor: "Emily Johnson",
+                            rating: 4,
+                            image: "https://via.placeholder.com/250x150?text=Design"
+                        },
+                        {
+                            title: "Data Science with R",
+                            instructor: "Michael Brown",
+                            rating: 3.5,
+                            image: "https://via.placeholder.com/250x150?text=Data+Science"
+                        },
+                        {
+                            title: "Machine Learning Fundamentals",
+                            instructor: "Sarah Wilson",
+                            rating: 4.8,
+                            image: "https://via.placeholder.com/250x150?text=Machine+Learning"
+                        },
+                        {
+                            title: "Business Strategy 101",
+                            instructor: "David Lee",
+                            rating: 4.2,
+                            image: "https://via.placeholder.com/250x150?text=Business+Strategy"
+                        },
+                        {
+                            title: "Art History Overview",
+                            instructor: "Laura Martinez",
+                            rating: 3.9,
+                            image: "https://via.placeholder.com/250x150?text=Art+History"
+                        },
+                        {
+                            title: "Introduction to Quantum Physics",
+                            instructor: "Robert Kim",
+                            rating: 4.7,
+                            image: "https://via.placeholder.com/250x150?text=Quantum+Physics"
+                        },
+                        // Add more simulated courses as needed
+                    ];
+
+                    // Filter results based on query (simple case-insensitive match)
+                    const filtered = results.filter(course =>
+                        course.title.toLowerCase().includes(query.toLowerCase()) ||
+                        course.instructor.toLowerCase().includes(query.toLowerCase())
+                    );
+
+                    resolve(filtered);
+                }, 2000); // Simulate 2 seconds loading time
+            });
+        }
+
+        // Function to generate star ratings
+        function generateStars(rating) {
+            const fullStar = 'https://img.icons8.com/ios-filled/50/ffffff/star--v1.png';
+            const halfStar = 'https://img.icons8.com/ios-filled/50/ffffff/star-half-empty.png';
+            const emptyStar = 'https://img.icons8.com/ios-filled/50/ffffff/star-0.5.png';
+            let starsHtml = '';
+
+            for (let i = 1; i <= 5; i++) {
+                if (rating >= i) {
+                    starsHtml += `<img src="${fullStar}" alt="Star">`;
+                } else if (rating >= i - 0.5) {
+                    starsHtml += `<img src="${halfStar}" alt="Half Star">`;
+                } else {
+                    starsHtml += `<img src="${emptyStar}" alt="Empty Star">`;
+                }
+            }
+
+            return starsHtml;
+        }
+
+        // Initialize search page
+        document.addEventListener('DOMContentLoaded', async () => {
+            const query = getQueryParam('q') || '';
+            const searchInput = document.getElementById('searchInput');
+            const searchTermSpan = document.getElementById('searchTerm');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const coursesRow = document.getElementById('coursesRow');
+
+            // Set search input value and display search term
+            searchInput.value = query;
+            searchTermSpan.textContent = query;
+
+            if (query !== '') {
+                // Show loading indicator
+                loadingIndicator.style.display = 'flex';
+                coursesRow.style.display = 'none';
+
+                // Fetch search results
+                const results = await fetchSearchResults(query);
+
+                // Hide loading indicator
+                loadingIndicator.style.display = 'none';
+                coursesRow.style.display = 'flex';
+
+                if (results.length === 0) {
+                    coursesRow.innerHTML = '<p>No courses found matching your search.</p>';
+                } else {
+                    // Populate courses
+                    results.forEach(course => {
+                        const courseItem = document.createElement('div');
+                        courseItem.classList.add('course-item');
+
+                        courseItem.innerHTML = `
+                            <img src="${course.image}" alt="${course.title}">
+                            <div class="course-info">
+                                <div class="course-title">${course.title}</div>
+                                <div class="course-instructor">${course.instructor}</div>
+                                <div class="course-rating">
+                                    ${generateStars(course.rating)}
+                                </div>
+                            </div>
+                        `;
+
+                        coursesRow.appendChild(courseItem);
+                    });
+                }
+            } else {
+                // If no query, show a message or default content
+                loadingIndicator.style.display = 'none';
+                coursesRow.style.display = 'flex';
+                coursesRow.innerHTML = '<p>Please enter a search term to find courses.</p>';
+            }
+
+            // Handle search input submission
+            searchInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    const newQuery = searchInput.value.trim();
+                    if (newQuery !== '') {
+                        // Redirect to /search page with new query
+                        window.location.href = `/search?q=${encodeURIComponent(newQuery)}`;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
